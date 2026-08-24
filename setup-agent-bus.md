@@ -34,53 +34,30 @@ plus rapide.
 git clone https://github.com/olimartel6/loggic-agent-bus.git ~/loggic-agent-bus
 ```
 
-### 2. Déclarer l'identité
+### 2. Tout installer d'un coup
 
 ```bash
-mkdir -p ~/.loggic ~/bin
-cat > ~/.loggic/agent-bus.conf <<EOF
-{"me": "charlo", "repo": "$HOME/loggic-agent-bus"}
-EOF
+bash ~/loggic-agent-bus/install/install.sh charlo
 ```
 
-`"me"` doit être exactement `charlo` sur cette machine. C'est ce qui détermine
-quelle inbox est la sienne et qui signe les messages sortants.
+Le script est **idempotent** — on peut le relancer sans risque. Il fait, en
+rapportant chaque étape :
 
-Les deux machines poussent avec le **même compte GitHub** (`olimartel6`), donc
-`git log` ne distingue pas les auteurs tout seul. Régler l'identité git locale au
-repo pour garder l'historique lisible :
+1. les dossiers `~/.loggic`, `~/bin`, `~/Library/LaunchAgents`
+2. la config d'identité `~/.loggic/agent-bus.conf` (`"me": "charlo"`)
+3. le lien `~/bin/bus`
+4. l'identité git locale au repo (`user.name = charlo`) — les deux machines
+   poussent sous le même compte GitHub, c'est ce qui garde `git log` lisible
+5. `~/bin` dans le `PATH` du `.zshrc`
+6. le plist launchd, adapté au bon `$HOME`
+7. le chargement du cron (`bus poll` aux 10 min)
 
-```bash
-git -C ~/loggic-agent-bus config user.name  "charlo"
-git -C ~/loggic-agent-bus config user.email "charlo@loggic.local"
-```
+Si Claude Code refuse de le lancer (le classificateur bloque les changements
+système persistants : symlink, `.zshrc`, launchd), c'est normal — taper `!`
+devant la commande pour l'exécuter soi-même.
 
-C'est local à ce repo — ça ne touche pas les autres projets.
-
-### 3. Installer la commande
-
-```bash
-ln -sf ~/loggic-agent-bus/bin/agent-bus.py ~/bin/bus
-```
-
-Vérifier que `~/bin` est dans le `PATH` ; sinon l'ajouter au `~/.zshrc` :
-
-```bash
-grep -q 'HOME/bin' ~/.zshrc || printf '\nexport PATH="$HOME/bin:$PATH"\n' >> ~/.zshrc
-```
-
-### 4. Le cron launchd
-
-```bash
-sed "s|/Users/oli|$HOME|g" ~/loggic-agent-bus/install/com.loggic.agent-bus.plist \
-  > ~/Library/LaunchAgents/com.loggic.agent-bus.plist
-launchctl unload ~/Library/LaunchAgents/com.loggic.agent-bus.plist 2>/dev/null
-launchctl load  ~/Library/LaunchAgents/com.loggic.agent-bus.plist
-launchctl list | grep agent-bus     # doit afficher le label avec un statut 0
-```
-
-Le `PATH` est déclaré explicitement dans le plist — launchd n'hérite pas du
-shell, et sans ça `git` (Homebrew) est introuvable.
+**Ne pas coller de longue commande en une ligne** : les sauts de ligne introduits
+par le copier-coller cassent la chaîne `&&` en silence. Le script existe pour ça.
 
 ### 5. Vérifier
 
