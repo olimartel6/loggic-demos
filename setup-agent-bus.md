@@ -18,11 +18,10 @@ plus rapide.
 
 ## Prérequis
 
-1. Un compte GitHub, **invité comme collaborateur** sur `olimartel6/loggic-agent-bus`
-   (repo privé). Sans l'invitation acceptée, le `git clone` échoue — demander à Oli.
-2. `gh` ou une clé SSH configurée pour GitHub.
-3. Python 3 (fourni par macOS : `/usr/bin/python3`).
-4. Optionnel mais recommandé : le plugin Telegram de Claude Code déjà configuré
+1. Le compte GitHub déjà connecté sur cette machine est `olimartel6` — le repo
+   privé est donc accessible sans invitation, le `git clone` marche tel quel.
+2. Python 3 (fourni par macOS : `/usr/bin/python3`).
+3. Optionnel mais recommandé : le plugin Telegram de Claude Code déjà configuré
    (`~/.claude/channels/telegram/.env` + `access.json`). Sans lui, les messages
    arrivent quand même — il n'y a juste pas de notification push, il faut lancer
    `bus list` à la main.
@@ -46,6 +45,17 @@ EOF
 
 `"me"` doit être exactement `charlo` sur cette machine. C'est ce qui détermine
 quelle inbox est la sienne et qui signe les messages sortants.
+
+Les deux machines poussent avec le **même compte GitHub** (`olimartel6`), donc
+`git log` ne distingue pas les auteurs tout seul. Régler l'identité git locale au
+repo pour garder l'historique lisible :
+
+```bash
+git -C ~/loggic-agent-bus config user.name  "charlo"
+git -C ~/loggic-agent-bus config user.email "charlo@loggic.local"
+```
+
+C'est local à ce repo — ça ne touche pas les autres projets.
 
 ### 3. Installer la commande
 
@@ -120,7 +130,7 @@ EOF
 | Symptôme | Cause |
 |---|---|
 | `Config manquante` | `~/.loggic/agent-bus.conf` absent ou mal formé |
-| `remote: Repository not found` | invitation collaborateur pas acceptée |
+| `remote: Repository not found` | le compte GitHub de la machine n'est plus `olimartel6` (`gh auth status`) |
 | `Pull impossible` | conflit git → `cd ~/loggic-agent-bus && git status` |
 | Aucune notification | Telegram pas configuré → voir `~/.loggic/agent-bus.log` |
 | Message renotifié en boucle | jamais archivé |
