@@ -59,7 +59,7 @@ devant la commande pour l'exécuter soi-même.
 **Ne pas coller de longue commande en une ligne** : les sauts de ligne introduits
 par le copier-coller cassent la chaîne `&&` en silence. Le script existe pour ça.
 
-### 5. Vérifier
+### 3. Vérifier
 
 ```bash
 bus list                                     # devrait afficher l'inbox
